@@ -1,12 +1,11 @@
 import axios from "axios";
 
 import DataProvider from "../../src/index";
-import "./index.mock";
 
 describe("create", () => {
     it("correct response", async () => {
         const response = await DataProvider(
-            "https://api.fake-rest.refine.dev",
+            "https://alpha-be.cafn.dev",
             axios,
         ).getList({
             resource: "animals",
