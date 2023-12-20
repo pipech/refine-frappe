@@ -8,18 +8,24 @@ export default (
     Required<DataProvider>,
     "createMany" | "updateMany" | "deleteMany"
 > => ({
-    getList: async ({ resource, pagination, filters, sorters, meta }) => {
+    getList: async <TData>({
+        resource,
+        pagination,
+        filters,
+        sorters,
+        meta,
+    }) => {
         try {
-            const data = await client.db().getDocList(resource, {});
+            const data = await client.db().getDocList<TData>(resource, {});
             return { data, total: data.length };
         } catch (e) {
             return Promise.reject(handleError(e));
         }
     },
 
-    getMany: async ({ resource, ids, meta }) => {
+    getMany: async <TData>({ resource, ids, meta }) => {
         try {
-            const data = await client.db().getDocList(resource, {
+            const data = await client.db().getDocList<TData>(resource, {
                 filters: [["name", "in", ids]],
             });
             return { data };
