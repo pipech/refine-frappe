@@ -1,0 +1,26 @@
+{
+  "name": "refine-frappe",
+  "version": "1.0.0",
+  "description": "Refine-Frappe data provider",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pipech/refine-frappe.git"
+  },
+  "keywords": [
+    "Refine",
+    "Frappe"
+  ],
+  "author": "pipeCh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pipech/refine-frappe/issues"
+  },
+  "homepage": "https://github.com/pipech/refine-frappe#readme",
+  "dependencies": {
+    "axios": "^1.6.2"
+  }
+}
