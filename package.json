@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/pipech/refine-frappe#readme",
   "dependencies": {
-    "axios": "^1.6.2"
+    "@refinedev/core": "^4.46.0",
+    "axios": "^1.6.2",
+    "query-string": "^8.1.0"
   }
 }
