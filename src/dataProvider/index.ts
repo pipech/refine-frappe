@@ -1,203 +1,97 @@
-import { AxiosInstance } from "axios";
-import { stringify } from "query-string";
 import { DataProvider } from "@refinedev/core";
-import { axiosInstance, generateSort, generateFilter } from "../utils";
-
-type MethodTypes = "get" | "delete" | "head" | "options";
-type MethodTypesWithBody = "post" | "put" | "patch";
+import { FrappeApp } from "frappe-js-sdk";
+import { handleError } from "../utils/handleError";
 
 export default (
-    apiUrl: string,
-    httpClient: AxiosInstance = axiosInstance,
+    client: FrappeApp,
 ): Omit<
     Required<DataProvider>,
     "createMany" | "updateMany" | "deleteMany"
 > => ({
     getList: async ({ resource, pagination, filters, sorters, meta }) => {
-        const url = `${apiUrl}/${resource}`;
-
-        const {
-            current = 1,
-            pageSize = 10,
-            mode = "server",
-        } = pagination ?? {};
-
-        const { headers: headersFromMeta, method } = meta ?? {};
-        const requestMethod = (method as MethodTypes) ?? "get";
-
-        const queryFilters = generateFilter(filters);
-
-        const query: {
-            _start?: number;
-            _end?: number;
-            _sort?: string;
-            _order?: string;
-        } = {};
-
-        if (mode === "server") {
-            query._start = (current - 1) * pageSize;
-            query._end = current * pageSize;
+        try {
+            const data = await client.db().getDocList(resource, {});
+            return { data, total: data.length };
+        } catch (e) {
+            return Promise.reject(handleError(e));
         }
-
-        const generatedSort = generateSort(sorters);
-        if (generatedSort) {
-            const { _sort, _order } = generatedSort;
-            query._sort = _sort.join(",");
-            query._order = _order.join(",");
-        }
-
-        const { data, headers } = await httpClient[requestMethod](
-            `${url}?${stringify(query)}&${stringify(queryFilters)}`,
-            {
-                headers: headersFromMeta,
-            },
-        );
-
-        const total = +headers["x-total-count"];
-
-        const r = {
-            data,
-            total: total || data.length,
-        };
-
-        console.debug(r);
-
-        return r;
     },
 
     getMany: async ({ resource, ids, meta }) => {
-        const { headers, method } = meta ?? {};
-        const requestMethod = (method as MethodTypes) ?? "get";
-
-        const { data } = await httpClient[requestMethod](
-            `${apiUrl}/${resource}?${stringify({ id: ids })}`,
-            { headers },
-        );
-
-        return {
-            data,
-        };
+        try {
+            const data = await client.db().getDocList(resource, {
+                filters: [["name", "in", ids]],
+            });
+            return { data };
+        } catch (e) {
+            return Promise.reject(handleError(e));
+        }
     },
 
-    create: async ({ resource, variables, meta }) => {
-        const url = `${apiUrl}/${resource}`;
-
-        const { headers, method } = meta ?? {};
-        const requestMethod = (method as MethodTypesWithBody) ?? "post";
-
-        const { data } = await httpClient[requestMethod](url, variables, {
-            headers,
-        });
-
-        return {
-            data,
-        };
+    create: async <TData>({ resource, variables, meta }) => {
+        try {
+            const data = await client
+                .db()
+                .createDoc<TData>(resource, variables);
+            return { data };
+        } catch (e) {
+            return Promise.reject(handleError(e));
+        }
     },
 
-    update: async ({ resource, id, variables, meta }) => {
-        const url = `${apiUrl}/${resource}/${id}`;
-
-        const { headers, method } = meta ?? {};
-        const requestMethod = (method as MethodTypesWithBody) ?? "patch";
-
-        const { data } = await httpClient[requestMethod](url, variables, {
-            headers,
-        });
-
-        return {
-            data,
-        };
+    update: async <TData>({ resource, id, variables, meta }) => {
+        try {
+            const data = await client
+                .db()
+                .updateDoc<TData>(resource, id, variables);
+            return { data };
+        } catch (e) {
+            return Promise.reject(handleError(e));
+        }
     },
 
-    getOne: async ({ resource, id, meta }) => {
-        const url = `${apiUrl}/${resource}/${id}`;
-
-        const { headers, method } = meta ?? {};
-        const requestMethod = (method as MethodTypes) ?? "get";
-
-        const { data } = await httpClient[requestMethod](url, { headers });
-
-        return {
-            data,
-        };
+    getOne: async <TData>({ resource, id, meta }) => {
+        try {
+            const data = await client.db().getDoc<TData>(resource, id);
+            return { data };
+        } catch (e) {
+            return Promise.reject(handleError(e));
+        }
     },
 
-    deleteOne: async ({ resource, id, variables, meta }) => {
-        const url = `${apiUrl}/${resource}/${id}`;
+    deleteOne: async <TData>({ resource, id, variables, meta }) => {
+        try {
+            const data = await client.db().deleteDoc(resource, String(id));
+            return { data: data.message } as TData;
+        } catch (e) {
+            return Promise.reject(handleError(e));
+        }
+    },
 
-        const { headers, method } = meta ?? {};
-        const requestMethod = (method as MethodTypesWithBody) ?? "delete";
+    custom: async <TData>({ url, method, payload }) => {
+        const call = client.call();
 
-        const { data } = await httpClient[requestMethod](url, {
-            data: variables as any,
-            headers,
-        });
+        let data;
 
-        return {
-            data,
-        };
+        switch (method) {
+            case "get":
+                data = await call.get<TData>(url, payload);
+                break;
+            case "post":
+                data = await call.post<TData>(url, payload);
+                break;
+            case "put":
+                data = await call.put<TData>(url, payload);
+                break;
+            case "delete":
+                data = await call.delete<TData>(url, payload);
+                break;
+        }
+
+        return { data: data.message };
     },
 
     getApiUrl: () => {
-        return apiUrl;
-    },
-
-    custom: async ({
-        url,
-        method,
-        filters,
-        sorters,
-        payload,
-        query,
-        headers,
-    }) => {
-        let requestUrl = `${url}?`;
-
-        if (sorters) {
-            const generatedSort = generateSort(sorters);
-            if (generatedSort) {
-                const { _sort, _order } = generatedSort;
-                const sortQuery = {
-                    _sort: _sort.join(","),
-                    _order: _order.join(","),
-                };
-                requestUrl = `${requestUrl}&${stringify(sortQuery)}`;
-            }
-        }
-
-        if (filters) {
-            const filterQuery = generateFilter(filters);
-            requestUrl = `${requestUrl}&${stringify(filterQuery)}`;
-        }
-
-        if (query) {
-            requestUrl = `${requestUrl}&${stringify(query)}`;
-        }
-
-        let axiosResponse;
-        switch (method) {
-            case "put":
-            case "post":
-            case "patch":
-                axiosResponse = await httpClient[method](url, payload, {
-                    headers,
-                });
-                break;
-            case "delete":
-                axiosResponse = await httpClient.delete(url, {
-                    data: payload,
-                    headers: headers,
-                });
-                break;
-            default:
-                axiosResponse = await httpClient.get(requestUrl, {
-                    headers,
-                });
-                break;
-        }
-
-        const { data } = axiosResponse;
-
-        return Promise.resolve({ data });
+        return client.url;
     },
 });

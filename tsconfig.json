@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
-            "rootDir": "./src",
-            "baseUrl": ".",
-            "types": ["jest", "node"]
+        "rootDir": ".",
+        "baseUrl": ".",
+        "types": ["jest", "node"]
     },
     "include": [
         "./src",
