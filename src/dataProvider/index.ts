@@ -1,6 +1,6 @@
 import { DataProvider } from "@refinedev/core";
 import { FrappeApp } from "frappe-js-sdk";
-import { handleError } from "../utils/handleError";
+import { handleError } from "src/utils/handleError";
 
 export default (
     client: FrappeApp,
