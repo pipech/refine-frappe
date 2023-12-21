@@ -1,10 +1,10 @@
 import { IDataProviderParams } from "../../src/types";
 
 export const frappeConfig: IDataProviderParams = {
-    url: "https://beta-be.cafn.dev",
+    url: "https://alpha-be.cafn.dev",
     tokenParams: {
         useToken: true,
-        token: () => "049067737c911c1:5b467c1e3d63b6f",
+        token: () => "94ce55fdf91556f:eb1280f00b836e5",
         type: "token",
     },
 };
