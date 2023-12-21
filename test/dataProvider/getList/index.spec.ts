@@ -1,9 +1,9 @@
 import { DataProvider } from "../../../src";
-import { frappe } from "../dataClient";
+import { frappeConfig } from "../dataClient";
 
 describe("getList", () => {
     it("base", async () => {
-        const response = await DataProvider(frappe).getList({
+        const response = await DataProvider(frappeConfig).getList({
             resource: "Sales Order",
         });
 

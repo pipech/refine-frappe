@@ -1,9 +1,9 @@
 import { DataProvider } from "../../../src";
-import { frappe } from "../dataClient";
+import { frappeConfig } from "../dataClient";
 
 describe("create", () => {
     it("base", async () => {
-        const response = await DataProvider(frappe).create({
+        const response = await DataProvider(frappeConfig).create({
             resource: "ToDo",
             variables: {
                 description: "Helo",
