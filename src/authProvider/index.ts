@@ -1,4 +1,5 @@
 import { AuthBindings } from "@refinedev/core";
+import { AuthActionResponse } from "@refinedev/core/dist/interfaces";
 import { FrappeApp } from "frappe-js-sdk";
 import { handleError } from "src/utils/handleError";
 
@@ -13,7 +14,11 @@ interface logoutParams {
 }
 
 export default (client: FrappeApp): AuthBindings => ({
-    login: async ({ username, password, redirectTo }: LoginParams) => {
+    login: async ({
+        username,
+        password,
+        redirectTo,
+    }: LoginParams): Promise<AuthActionResponse> => {
         try {
             const response = await client.auth().loginWithUsernamePassword({
                 username,
@@ -23,6 +28,12 @@ export default (client: FrappeApp): AuthBindings => ({
             if (response) {
                 return { success: true, redirectTo, ...response };
             }
+            return {
+                success: false,
+                error: handleError({
+                    message: "An unknown error occurred while logging in.",
+                }),
+            };
         } catch (error) {
             return {
                 success: false,
