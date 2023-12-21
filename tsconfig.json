@@ -1,11 +1,27 @@
 {
     "compilerOptions": {
+        "module": "esnext",
+        "lib": ["dom", "esnext", "DOM.Iterable"],
+        "importHelpers": true,
+        "declaration": true,
+        "sourceMap": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "moduleResolution": "node",
+        "jsx": "react",
+        "noEmit": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
         "rootDir": ".",
         "baseUrl": ".",
-        "types": ["jest", "node"]
+        "types": ["jest", "node"],
+        "esModuleInterop": true,
     },
     "include": [
         "./src",
         "./test"
-    ]
+    ],
+    "exclude": ["node_modules"],
 }
