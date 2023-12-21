@@ -1,78 +1,64 @@
-import { AuthBindings, HttpError } from "@refinedev/core";
-import axios from "axios";
+import { AuthBindings } from "@refinedev/core";
+import { FrappeApp } from "frappe-js-sdk";
+import { handleError } from "src/utils/handleError";
 
-export const authProvider = (API_URL: string): AuthBindings => {
-    const axiosInstance = axios.create();
+interface LoginParams {
+    username: string;
+    password: string;
+    redirectTo?: string;
+}
 
-    axiosInstance.interceptors.response.use(
-        (response) => {
-            return response;
-        },
-        (error) => {
-            const customError: HttpError = {
-                ...error,
-                message: error.response?.data?.message,
-                statusCode: error.response?.status,
+interface logoutParams {
+    redirectTo?: string;
+}
+
+export default (client: FrappeApp): AuthBindings => ({
+    login: async ({ username, password, redirectTo }: LoginParams) => {
+        try {
+            const response = await client.auth().loginWithUsernamePassword({
+                username,
+                password,
+            });
+
+            if (response) {
+                return { success: true, redirectTo, ...response };
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: handleError(error),
             };
+        }
+    },
+    logout: async ({ redirectTo }: logoutParams) => {
+        try {
+            await client.auth().logout();
 
-            return Promise.reject(customError);
-        },
-    );
-    axiosInstance.defaults.baseURL = API_URL;
+            return {
+                success: true,
+                redirectTo,
+            };
+        } catch (error) {
+            return {
+                success: false,
+            };
+        }
+    },
+    onError: async (error) => {
+        console.error(error);
+        return { error };
+    },
+    check: async () => {
+        const user = await client.auth().getLoggedInUser();
+        if (user) {
+            return { authenticated: true };
+        }
+        return { authenticated: false };
+    },
+    getIdentity: async () => {
+        const user = await client.auth().getLoggedInUser();
 
-    return {
-        login: async ({ username, password }) => {
-            try {
-                const response = await axiosInstance.post(
-                    "/auth",
-                    { email: username, password: password },
-                    {
-                        withCredentials: true,
-                    },
-                );
-
-                if (response) {
-                    return { succes: true, ...response.data.customer };
-                }
-            } catch (error) {
-                return {
-                    success: false,
-                    error,
-                };
-            }
-        },
-        logout: async ({ redirectTo }: { redirectTo: string }) => {
-            try {
-                axiosInstance
-                    .delete("/auth")
-                    .then(() => localStorage.removeItem("user"));
-
-                return {
-                    success: true,
-                    redirectTo,
-                };
-            } catch (error) {
-                return {
-                    success: false,
-                };
-            }
-        },
-        onError: async (error) => {
-            console.error(error);
-            return { error };
-        },
-        check: async () => {
-            const { data: session } = await axiosInstance.get("/auth");
-            if (session) {
-                return { authenticated: true };
-            }
-            return { authenticated: false };
-        },
-        getIdentity: async () => {
-            const { data: session } = await axiosInstance.get("/auth");
-
-            return { ...session.customer };
-        },
-        getPermissions: () => Promise.resolve(),
-    };
-};
+        return { user };
+    },
+    getPermissions: () => Promise.resolve(),
+});
