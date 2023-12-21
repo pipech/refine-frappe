@@ -5,3 +5,8 @@ export interface IDataProviderParams {
     tokenParams?: TokenParams;
     name?: string;
 }
+
+export interface IAuthProviderParams {
+    url: string;
+    name?: string;
+}

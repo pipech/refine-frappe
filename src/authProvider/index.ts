@@ -2,6 +2,7 @@ import { AuthBindings } from "@refinedev/core";
 import { AuthActionResponse } from "@refinedev/core/dist/interfaces";
 import { FrappeApp } from "frappe-js-sdk";
 import { handleError } from "../utils/handleError";
+import { IAuthProviderParams } from "src/types";
 
 interface LoginParams {
     username: string;
@@ -13,7 +14,11 @@ interface logoutParams {
     redirectTo?: string;
 }
 
-export default (client: FrappeApp): AuthBindings => ({
+export default (params: IAuthProviderParams): AuthBindings => {
+    const { url, name } = params;
+    const client = new FrappeApp(url, undefined, name);
+
+    return {
     login: async ({
         username,
         password,
@@ -72,4 +77,4 @@ export default (client: FrappeApp): AuthBindings => ({
         return { user };
     },
     getPermissions: () => Promise.resolve(),
-});
+}};
