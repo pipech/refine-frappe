@@ -1,7 +1,7 @@
 import { AuthBindings } from "@refinedev/core";
 import { AuthActionResponse } from "@refinedev/core/dist/interfaces";
 import { FrappeApp } from "frappe-js-sdk";
-import { handleError } from "src/utils/handleError";
+import { handleError } from "../utils/handleError";
 
 interface LoginParams {
     username: string;

@@ -1,4 +1,4 @@
-import DataProvider from "../../../src/index";
+import { DataProvider } from "../../../src";
 import { frappe } from "../dataClient";
 
 describe("getMany", () => {

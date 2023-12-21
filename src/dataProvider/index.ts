@@ -18,7 +18,7 @@ import {
 } from "@refinedev/core";
 import { FrappeApp } from "frappe-js-sdk";
 import { FrappeDoc } from "frappe-js-sdk/lib/db/types";
-import { handleError } from "src/utils/handleError";
+import { handleError } from "../utils/handleError";
 
 /**
  * Casts an unknown value to the specified type.
