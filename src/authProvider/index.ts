@@ -5,7 +5,7 @@ import { handleError } from "../utils/handleError";
 import { IAuthProviderParams } from "src/types";
 
 interface LoginParams {
-    username: string;
+    email: string;
     password: string;
     redirectTo?: string;
 }
@@ -20,13 +20,13 @@ export default (params: IAuthProviderParams): AuthBindings => {
 
     return {
     login: async ({
-        username,
+        email,
         password,
         redirectTo,
     }: LoginParams): Promise<AuthActionResponse> => {
         try {
             const response = await client.auth().loginWithUsernamePassword({
-                username,
+                username: email,
                 password,
             });
 
