@@ -3,6 +3,7 @@ import { AuthActionResponse } from "@refinedev/core/dist/interfaces";
 import { FrappeApp } from "frappe-js-sdk";
 import { handleError } from "../utils/handleError";
 import { IAuthProviderParams } from "src/types";
+import Cookies from 'js-cookie'
 
 interface LoginParams {
     email: string;
@@ -46,15 +47,15 @@ export default (params: IAuthProviderParams): AuthBindings => {
             };
         }
     },
-    logout: async ({ redirectTo }: logoutParams) => {
+    logout: async () => {
         try {
             await client.auth().logout();
-
             return {
                 success: true,
-                redirectTo,
+                redirectTo: "/login",
             };
         } catch (error) {
+            console.error(error)
             return {
                 success: false,
             };
@@ -65,16 +66,37 @@ export default (params: IAuthProviderParams): AuthBindings => {
         return { error };
     },
     check: async () => {
-        const user = await client.auth().getLoggedInUser();
-        if (user) {
-            return { authenticated: true };
+        if (!Cookies.get('user_id') || Cookies.get('user_id') === 'Guest') {
+            return {
+                authenticated: false,
+                redirectTo: "/login",
+            };
         }
-        return { authenticated: false };
+
+        try {
+            const user = await client.auth().getLoggedInUser();
+            if (user) {
+                return { authenticated: true };
+            }
+        } catch (error: any) {
+            if (error?.exc_type !== "PermissionError") {
+                console.error(error);
+            }
+        }
+        
+        return {
+            authenticated: false,
+            redirectTo: "/login",
+        };
     },
     getIdentity: async () => {
         const user = await client.auth().getLoggedInUser();
 
-        return { user };
+        return {
+            id: user,
+            name: user,
+            avatar: "https://i.pravatar.cc/300",
+        };
     },
     getPermissions: () => Promise.resolve(),
 }};
