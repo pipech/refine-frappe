@@ -10,3 +10,8 @@ export interface IAuthProviderParams {
     url: string;
     name?: string;
 }
+
+export interface IAccessControlProviderParams {
+    url: string;
+    name?: string;
+}
