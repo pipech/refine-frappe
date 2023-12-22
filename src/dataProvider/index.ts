@@ -46,7 +46,13 @@ export default (
             meta,
         }: GetListParams): Promise<GetListResponse<TData>> => {
             try {
-                const data = await client.db().getDocList<TData>(resource, {});
+                const data = await client.db().getDocList<TData>(resource, {
+                    fields: ["*"],
+                });
+                // loop and map "name" to "id"
+                data.forEach((d) => {
+                    d.id = d.name;
+                });
                 return { data, total: data.length };
             } catch (e) {
                 return Promise.reject(handleError(e));
