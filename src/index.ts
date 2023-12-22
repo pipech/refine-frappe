@@ -1,5 +1,5 @@
-export { default as DataProvider } from "./dataProvider";
-export { default as AuthProvider } from "./authProvider";
-export { default as AccessControlProvider } from './accessControlProvider'
+export { default as accessControlProvider } from './accessControlProvider'
+export { default as authProvider } from "./authProvider";
+export { default as dataProvider } from "./dataProvider";
 
 export * from "./utils";
