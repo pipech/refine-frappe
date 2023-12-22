@@ -20,6 +20,7 @@ import { FrappeApp } from "frappe-js-sdk";
 import { FrappeDoc, Filter } from "frappe-js-sdk/lib/db/types";
 import { handleError } from "../utils/handleError";
 import { generateFilter } from "../utils/generateFilter";
+import { generatePagination } from "../utils/generatePagination";
 import { IDataProviderParams } from "../types";
 
 /**
@@ -52,20 +53,39 @@ export default (
                 // and we can't get correct total count
                 // since getCount doesn't support orFilter
                 const fpFilters = unsafeCaster<Filter<FrappeDoc<TData>>[]>(generateFilter(filters))
-                const fpPagination = undefined;
+                const fpPagination = generatePagination(pagination || {});
                 const fpSorters = undefined;
 
                 const data = await client.db().getDocList<TData>(resource, {
                     fields: ["*"],
                     filters: fpFilters,
+                    limit_start: fpPagination.limit_page_start,
+                    limit: fpPagination.limit_page_length,
                 });
 
-                const total = await client.db().getCount(resource, fpFilters);
+                // frappe.get_count doesn't consider permissions (or custom permissions)
+                // so we'll get count using get_count from reportview
+                // const total = await client.db().getCount(resource, fpFilters);
+                let total = await client.call().get(
+                    'frappe.desk.reportview.get_count', {
+                        filters: fpFilters,
+                        doctype: resource
+                    }
+                );
+                total = total.message || 0
+                // let total = await client.db().getDocList<TData>(resource, {
+                //     fields: ['count("name")'],
+                //     filters: fpFilters,
+                // });
+
+                // total = total[0]["count(\"name\")"];
+
 
                 // loop and map "name" to "id"
                 data.forEach((d) => {
                     d.id = d.name;
                 });
+                const r = { data, total }
                 return { data, total };
             } catch (e) {
                 return Promise.reject(handleError(e));
