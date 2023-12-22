@@ -17,8 +17,9 @@ import {
     CustomResponse,
 } from "@refinedev/core";
 import { FrappeApp } from "frappe-js-sdk";
-import { FrappeDoc } from "frappe-js-sdk/lib/db/types";
+import { FrappeDoc, Filter } from "frappe-js-sdk/lib/db/types";
 import { handleError } from "../utils/handleError";
+import { generateFilter } from "../utils/generateFilter";
 import { IDataProviderParams } from "../types";
 
 /**
@@ -46,14 +47,26 @@ export default (
             meta,
         }: GetListParams): Promise<GetListResponse<TData>> => {
             try {
+                // We'll only support andFilter for now,
+                // it'll reduce complication 
+                // and we can't get correct total count
+                // since getCount doesn't support orFilter
+                const fpFilters = unsafeCaster<Filter<FrappeDoc<TData>>[]>(generateFilter(filters))
+                const fpPagination = undefined;
+                const fpSorters = undefined;
+
                 const data = await client.db().getDocList<TData>(resource, {
                     fields: ["*"],
+                    filters: fpFilters,
                 });
+
+                const total = await client.db().getCount(resource, fpFilters);
+
                 // loop and map "name" to "id"
                 data.forEach((d) => {
                     d.id = d.name;
                 });
-                return { data, total: data.length };
+                return { data, total };
             } catch (e) {
                 return Promise.reject(handleError(e));
             }
