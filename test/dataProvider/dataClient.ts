@@ -1,6 +1,6 @@
-import { IDataProviderParams } from "../../src/types";
+import { IFrappeProviderParams } from "../../src/types";
 
-export const frappeConfig: IDataProviderParams = {
+export const frappeConfig: IFrappeProviderParams = {
     url: "https://alpha-be.cafn.dev",
     tokenParams: {
         useToken: true,
