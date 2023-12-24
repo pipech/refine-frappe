@@ -30,7 +30,7 @@ describe("generateFilter", () => {
             },
         ];
         expect(() => generateFilter(filtersOr)).toThrow(
-            `[@refinedev/simple-rest]: \`operator: or\` is not supported.`,
+            `[refine-frappe]: \`filter\` must be a logical filter.`,
         );
         const filtersAnd: CrudFilter[] = [
             {
@@ -42,7 +42,7 @@ describe("generateFilter", () => {
             },
         ];
         expect(() => generateFilter(filtersAnd)).toThrow(
-            `[@refinedev/simple-rest]: \`operator: and\` is not supported.`,
+            `[refine-frappe]: \`filter\` must be a logical filter.`,
         );
         const filtersBoth: CrudFilter[] = [
             {
@@ -61,7 +61,7 @@ describe("generateFilter", () => {
             },
         ];
         expect(() => generateFilter(filtersBoth)).toThrow(
-            `[@refinedev/simple-rest]: \`operator: and\` is not supported.`,
+            `[refine-frappe]: \`filter\` must be a logical filter.`,
         );
     });
 });
