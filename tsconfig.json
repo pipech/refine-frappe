@@ -14,7 +14,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
-    "rootDir": "./src",
+    "rootDir": "./",
     "baseUrl": ".",
     "types": ["jest", "node"],
     "esModuleInterop": true

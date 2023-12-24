@@ -4,6 +4,13 @@
   "description": "Refine-Frappe data provider",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
   "scripts": {
     "start": "tsup --watch --format esm,cjs,iife --legacy-output",
     "build": "tsup --format esm,cjs,iife --minify --legacy-output",
@@ -22,6 +29,7 @@
   ],
   "author": "pipeCh",
   "license": "MIT",
+  "module": "dist/esm/index.js",
   "bugs": {
     "url": "https://github.com/pipech/refine-frappe/issues"
   },
