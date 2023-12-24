@@ -1,9 +1,9 @@
 import { AccessControlProvider, CanParams, CanReturnType } from '@refinedev/core'
-import { IAccessControlProviderParams } from 'src/types'
+import { IFrappeProviderParams } from 'src/types'
 import { FrappeApp } from "frappe-js-sdk";
 import { handleError } from "../utils/handleError";
 
-export default (params: IAccessControlProviderParams): AccessControlProvider => {
+export default (params: IFrappeProviderParams): AccessControlProvider => {
   const { url, name } = params;
   const client = new FrappeApp(url, undefined, name);
 

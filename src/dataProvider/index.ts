@@ -21,7 +21,7 @@ import { FrappeDoc, Filter } from "frappe-js-sdk/lib/db/types";
 import { handleError } from "../utils/handleError";
 import { generateFilter } from "../utils/generateFilter";
 import { generatePagination } from "../utils/generatePagination";
-import { IDataProviderParams } from "../types";
+import { IFrappeProviderParams } from "../types";
 
 /**
  * Casts an unknown value to the specified type.
@@ -34,7 +34,7 @@ const unsafeCaster = <TVal>(v: unknown): TVal => {
 };
 
 export default (
-    params: IDataProviderParams,
+    params: IFrappeProviderParams,
 ): Omit<Required<DataProvider>, "createMany" | "updateMany" | "deleteMany"> => {
     const { url, tokenParams, name } = params;
     const client = new FrappeApp(url, tokenParams, name);

@@ -2,7 +2,7 @@ import { AuthBindings } from "@refinedev/core";
 import { AuthActionResponse } from "@refinedev/core/dist/interfaces";
 import { FrappeApp } from "frappe-js-sdk";
 import { handleError } from "../utils/handleError";
-import { IAuthProviderParams } from "src/types";
+import { IFrappeProviderParams } from "src/types";
 import Cookies from 'js-cookie'
 
 interface LoginParams {
@@ -15,7 +15,7 @@ interface logoutParams {
     redirectTo?: string;
 }
 
-export default (params: IAuthProviderParams): AuthBindings => {
+export default (params: IFrappeProviderParams): AuthBindings => {
     const { url, name } = params;
     const client = new FrappeApp(url, undefined, name);
 
