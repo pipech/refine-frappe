@@ -49,10 +49,12 @@ export default (
         }: GetListParams): Promise<GetListResponse<TData>> => {
             try {
                 // We'll only support andFilter for now,
-                // it'll reduce complication 
+                // it'll reduce complication
                 // and we can't get correct total count
                 // since getCount doesn't support orFilter
-                const fpFilters = unsafeCaster<Filter<FrappeDoc<TData>>[]>(generateFilter(filters))
+                const fpFilters = unsafeCaster<Filter<FrappeDoc<TData>>[]>(
+                    generateFilter(filters),
+                );
                 const fpPagination = generatePagination(pagination || {});
                 const fpSorters = undefined;
 
@@ -66,13 +68,13 @@ export default (
                 // frappe.get_count doesn't consider permissions (or custom permissions)
                 // so we'll get count using get_count from reportview
                 // const total = await client.db().getCount(resource, fpFilters);
-                let total = await client.call().get(
-                    'frappe.desk.reportview.get_count', {
+                let total = await client
+                    .call()
+                    .get("frappe.desk.reportview.get_count", {
                         filters: fpFilters,
-                        doctype: resource
-                    }
-                );
-                total = total.message || 0
+                        doctype: resource,
+                    });
+                total = total.message || 0;
                 // let total = await client.db().getDocList<TData>(resource, {
                 //     fields: ['count("name")'],
                 //     filters: fpFilters,
@@ -80,12 +82,11 @@ export default (
 
                 // total = total[0]["count(\"name\")"];
 
-
                 // loop and map "name" to "id"
                 data.forEach((d) => {
                     d.id = d.name;
                 });
-                const r = { data, total }
+                const r = { data, total };
                 return { data, total };
             } catch (e) {
                 return Promise.reject(handleError(e));
