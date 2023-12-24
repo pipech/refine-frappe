@@ -1,9 +1,9 @@
-import { AccessControlProvider } from "../../src";
+import { accessControlProvider } from "../../src";
 import { frappeConfig } from "./dataClient";
 
 describe("create", () => {
     it("base", async () => {
-        const response = await AccessControlProvider(frappeConfig).can({
+        const response = await accessControlProvider(frappeConfig).can({
             resource: "Sales Order",
             action: "Read",
             params: {

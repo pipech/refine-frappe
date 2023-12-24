@@ -1,9 +1,9 @@
-import { DataProvider } from "../../../src";
+import { dataProvider } from "../../../src";
 import { frappeConfig } from "../dataClient";
 
 describe("deleteOne", () => {
     it("base", async () => {
-        const response = await DataProvider(frappeConfig).deleteOne({
+        const response = await dataProvider(frappeConfig).deleteOne({
             resource: "ToDo",
             id: "df0046d00c",
         });

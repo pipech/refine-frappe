@@ -1,9 +1,9 @@
-import { DataProvider } from "../../../src";
+import { dataProvider } from "../../../src";
 import { frappeConfig } from "../dataClient";
 
 describe("custom", () => {
     it("base", async () => {
-        const response = await DataProvider(frappeConfig).custom({
+        const response = await dataProvider(frappeConfig).custom({
             url: "frappe.ping",
             method: "get",
         });
