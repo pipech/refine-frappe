@@ -1,20 +1,14 @@
 import { CrudSorting } from "@refinedev/core";
 
-export const generateSort = (sorters?: CrudSorting) => {
-    if (sorters && sorters.length > 0) {
-        const _sort: string[] = [];
-        const _order: string[] = [];
-
-        sorters.map((item) => {
-            _sort.push(item.field);
-            _order.push(item.order);
-        });
-
-        return {
-            _sort,
-            _order,
-        };
+export const generateSort = (sorters?: CrudSorting): string | undefined => {
+    console.debug(sorters);
+    if (!(sorters && sorters.length > 0)) {
+        return undefined;
     }
 
-    return;
+    const sorterList = sorters.map((item) => {
+        return `${item.field} ${item.order}`;
+    });
+
+    return sorterList.join(",");
 };

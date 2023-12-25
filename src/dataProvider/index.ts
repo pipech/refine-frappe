@@ -21,6 +21,7 @@ import { FrappeDoc, Filter } from "frappe-js-sdk/lib/db/types";
 import { handleError } from "../utils/handleError";
 import { generateFilter } from "../utils/generateFilter";
 import { generatePagination } from "../utils/generatePagination";
+import { generateSort } from "../utils/generateSort";
 import { IFrappeProviderParams } from "../types";
 
 /**
@@ -56,14 +57,30 @@ export default (
                     generateFilter(filters),
                 );
                 const fpPagination = generatePagination(pagination || {});
-                const fpSorters = undefined;
+                // Incorrect type ???
+                const fpSorter = generateSort(sorters);
 
-                const data = await client.db().getDocList<TData>(resource, {
-                    fields: ["*"],
-                    filters: fpFilters,
-                    limit_start: fpPagination.limit_page_start,
-                    limit: fpPagination.limit_page_length,
-                });
+                // This api doesn't support multiple order by
+                // const data = await client.db().getDocList<TData>(resource, {
+                //     fields: ["name"],
+                //     filters: fpFilters,
+                //     orderBy: fpSorter,
+                //     limit_start: fpPagination.limit_page_start,
+                //     limit: fpPagination.limit_page_length,
+                // });
+
+                // Hot-fix
+                const dataB = await client
+                    .call()
+                    .get("frappe.client.get_list", {
+                        doctype: resource,
+                        fields: ["name"],
+                        filters: fpFilters,
+                        order_by: fpSorter,
+                        limit_start: fpPagination.limit_page_start,
+                        limit: fpPagination.limit_page_length,
+                    });
+                const data: TData[] = dataB.message || [];
 
                 // frappe.get_count doesn't consider permissions (or custom permissions)
                 // so we'll get count using get_count from reportview
@@ -80,7 +97,7 @@ export default (
                 //     filters: fpFilters,
                 // });
 
-                // total = total[0]["count(\"name\")"];
+                // total = total[0]['count("name")'];
 
                 // loop and map "name" to "id"
                 data.forEach((d) => {
