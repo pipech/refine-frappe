@@ -40,10 +40,14 @@ export default (params: IFrappeProviderParams): AuthBindings => {
                         message: "An unknown error occurred while logging in.",
                     }),
                 };
-            } catch (error) {
+            } catch (error: any) {
                 return {
                     success: false,
-                    error: handleError(error),
+                    error: handleError({
+                        message:
+                            error?.message ||
+                            "An unknown error occurred while logging in.",
+                    }),
                 };
             }
         },
