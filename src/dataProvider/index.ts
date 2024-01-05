@@ -23,7 +23,8 @@ import { generateFilter } from "../utils/generateFilter";
 import { generatePagination } from "../utils/generatePagination";
 import { generateSort } from "../utils/generateSort";
 import { IFrappeProviderParams } from "../types";
-
+import axios from "axios";
+import { HttpError } from "@refinedev/core";
 /**
  * Casts an unknown value to the specified type.
  * This function is unsafe and should be used with caution.
@@ -33,6 +34,24 @@ import { IFrappeProviderParams } from "../types";
 const unsafeCaster = <TVal>(v: unknown): TVal => {
     return v as TVal;
 };
+
+// Error handling with axios interceptors
+const axiosInstance = axios.create();
+
+axiosInstance.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        const customError: HttpError = {
+            ...error,
+            message: error.response?.data?.message,
+            statusCode: error.response?.status,
+        };
+
+        return Promise.reject(customError);
+    },
+);
 
 export default (
     params: IFrappeProviderParams,
@@ -69,17 +88,34 @@ export default (
                 //     limit: fpPagination.limit_page_length,
                 // });
 
-                // Hot-fix
-                const dataB = await client
-                    .call()
-                    .get("frappe.client.get_list", {
-                        doctype: resource,
-                        fields: ["name"],
-                        filters: fpFilters,
-                        order_by: fpSorter,
-                        limit_start: fpPagination.limit_page_start,
-                        limit: fpPagination.limit_page_length,
-                    });
+                const { data: dataB } = await axiosInstance.get(
+                    `${url}/api/method/frappe.client.get_list`,
+                    {
+                        withCredentials: true,
+                        params: {
+                            doctype: resource,
+                            fields: JSON.stringify(meta?.fields || ["name"]),
+                            filters: fpFilters,
+                            order_by: fpSorter,
+                            limit_start: fpPagination.limit_page_start,
+                            limit: fpPagination.limit_page_length,
+                        },
+                    },
+                );
+                // console.debug("AAAAAAAAAAAAAAAADATA");
+                // console.debug(aaaData);
+
+                // // Hot-fix
+                // const dataB = await client
+                //     .call()
+                //     .get("frappe.client.get_list", {
+                //         doctype: resource,
+                //         fields: [["name", "product_name"]],
+                //         filters: fpFilters,
+                //         order_by: fpSorter,
+                //         limit_start: fpPagination.limit_page_start,
+                //         limit: fpPagination.limit_page_length,
+                //     });
                 const data: TData[] = dataB.message || [];
 
                 // frappe.get_count doesn't consider permissions (or custom permissions)
