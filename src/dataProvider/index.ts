@@ -38,6 +38,16 @@ const unsafeCaster = <TVal>(v: unknown): TVal => {
 // Error handling with axios interceptors
 const axiosInstance = axios.create();
 
+axiosInstance.interceptors.request.use(
+    (config) => {
+        console.debug(config);
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    },
+);
+
 axiosInstance.interceptors.response.use(
     (response) => {
         return response;
@@ -95,7 +105,7 @@ export default (
                         params: {
                             doctype: resource,
                             fields: JSON.stringify(meta?.fields || ["name"]),
-                            filters: fpFilters,
+                            filters: JSON.stringify(fpFilters),
                             order_by: fpSorter,
                             limit_start: fpPagination.limit_page_start,
                             limit: fpPagination.limit_page_length,
@@ -124,7 +134,7 @@ export default (
                 let total = await client
                     .call()
                     .get("frappe.desk.reportview.get_count", {
-                        filters: fpFilters,
+                        filters: JSON.stringify(fpFilters),
                         doctype: resource,
                     });
                 total = total.message || 0;
